@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Chat\StoreRequest;
 use App\Http\Resources\Chat\ChatResource;
+use App\Http\Resources\Message\MessageResource;
 use App\Http\Resources\User\UserResource;
 use App\Models\Chat;
 use App\Models\User;
@@ -47,9 +48,13 @@ class ChatController extends Controller
 
         } catch(\Exception $exception){
             DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
         }
 
-        return redirect()->route('chat.show', $chat->id);
+        return redirect()->route('chats.show', $chat->id);
     }
 
 
@@ -58,7 +63,11 @@ class ChatController extends Controller
         $users = $chat->users()->get();
         $users = UserResource::collection($users)->resolve();
 
+        $messages = $chat->messages()->with('user')->get();
+        $messages = MessageResource::collection($messages)->resolve();
+
         $chat = ChatResource::make($chat)->resolve();
-        return inertia('Chat/Show', compact('chat', 'users'));
+
+        return inertia('Chat/Show', compact('chat', 'users', 'messages'));
     }
 }

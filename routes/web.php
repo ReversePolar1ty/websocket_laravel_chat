@@ -30,7 +30,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/chats', [ChatController::class, 'index'])->name('chats.index');
     Route::post('/chats', [ChatController::class, 'store'])->name('chats.store');
-    Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chat.show');
+    Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('chats.show');
 
 });
 

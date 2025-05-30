@@ -8,6 +8,7 @@ export default {
     props: [
         'chat',
         'users',
+        'messages',
     ],
 
     data() {
@@ -18,9 +19,26 @@ export default {
 
     layout: Main,
 
+    computed: {
+        userIds() {
+            return this.users.map( user => {
+                return user.id
+            }).filter(userId => {
+                return userId !== this.$page.props.auth.user.id
+            })
+        }
+    },
+
     methods: {
         store() {
-            axios.post('/messages', {})
+            axios.post('/messages', {
+                chat_id: this.chat.id,
+                body: this.body,
+                user_ids: this.userIds
+            })
+            .then( res => {
+                this.messages.push(res.data)
+            })
         }
     }
 }
@@ -30,11 +48,17 @@ export default {
   <div class="flex">
       <div class="w-3/4 p-4 mr-4 bg-white border border-gray-200" >
           <h3 class="text-gray-700 mb-4 text-lg">{{chat.title ?? 'Your chat'}}</h3>
-          <div class="mb-4">
-
+          <div class="mb-4" v-if="messages">
+              <div v-for="message in messages" :class="message.is_owner ? '' : 'text-right'">
+                  <div :class="['p-4 mb-4 border inline-block',
+                  message.is_owner ? 'bg-green-50 border-green-100' : 'bg-sky-50 border-sky-100']">
+                      <p class="text-sm">{{message.user_name}}</p>
+                      <p class="mb-2">{{message.body}}</p>
+                      <p class="text-xs italic">{{message.time}}</p>
+                  </div>
+              </div>
           </div>
           <div>
-              <h3 class="text-gray-700 mb-4 text-lg">Message</h3>
               <div>
                   <div class="mb-4">
                     <input placeholder="Your message" class="rounded-full border border-gray-400" type="text" v-model="body">
