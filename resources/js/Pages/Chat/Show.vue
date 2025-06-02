@@ -1,6 +1,7 @@
 ﻿<script>
-import Main from "@/Layouts/Main.vue"
+import Main from "@/Layouts/Main.vue";
 import InputError from "@/Components/InputError.vue";
+import Echo from "laravel-echo";
 export default {
     name: "Show",
     components: {InputError},
@@ -10,6 +11,14 @@ export default {
         'users',
         'messages',
     ],
+
+    mounted() {
+        window.Echo.channel('store-messages')
+            .listen('.store-message', res => {
+                console.log(res);
+            });
+    },
+
 
     data() {
         return{
@@ -43,7 +52,6 @@ export default {
     }
 }
 </script>
-
 <template>
   <div class="flex items-start">
       <div class="w-3/4 p-4 mr-4 bg-white border border-gray-200" >

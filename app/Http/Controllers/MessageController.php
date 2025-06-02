@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\StoreMessageEvent;
 use App\Http\Requests\Message\StoreRequest;
 use App\Http\Resources\Message\MessageResource;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Models\MessageStatus;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class MessageController extends Controller
@@ -26,6 +26,7 @@ class MessageController extends Controller
             ]);
 
             foreach ($data['user_ids'] as $user_id) {
+
                 MessageStatus::create([
                     'message_id' => $message->id,
                     'chat_id' => $data['chat_id'] ,
@@ -33,6 +34,7 @@ class MessageController extends Controller
                 ]);
             }
 
+            broadcast(new StoreMessageEvent($message));
             DB::commit();
 
         } catch (\Exception $exception) {
